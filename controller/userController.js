@@ -39,7 +39,8 @@ router.post('/registration',[
 
         const errors = validationResult(req);
         if(errors){
-                res.render('/registration',{
+                console.log('error occured');
+                res.render('users/registration',{
                         errors: errors
                 })
         }
