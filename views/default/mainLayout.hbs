@@ -9,6 +9,25 @@
 <body>
         <h3>Main Layout</h3>
        <div> 
+               <div>
+                   {{#if success_msg}}
+                        <div>
+                                <h6>{{success_msg}}</h6>
+                        </div>
+                   {{/if}}    
+
+                   {{#if errror_msg}}
+                        <div>
+                                <h6>{{errror_msg}}</h6>
+                        </div>
+                   {{/if}}    
+
+                   {{#if error}}
+                        <div>
+                                <h6>{{error}}</h6>
+                        </div>
+                   {{/if}}    
+               </div>
                {{{body}}}
         </div>
 </body>

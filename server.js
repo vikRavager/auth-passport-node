@@ -9,7 +9,7 @@ var session = require('express-session');
 var passport = require('passport');
 var localStrategy = require('passport-local');
 var cookieParser = require('cookie-parser');
-
+var expressValidator = require('express-validator');
 
 require('./models/db');
 
@@ -47,6 +47,24 @@ app.use(session({
         saveUninitialized : true,
         resave : true
 }));
+
+//use express-validator
+app.use(expressValidator({
+        errorFormatter: function(param, msg, value) {
+            var namespace = param.split('.')
+            , root    = namespace.shift()
+            , formParam = root;
+       
+          while(namespace.length) {
+            formParam += '[' + namespace.shift() + ']';
+          }
+          return {
+            param : formParam,
+            msg   : msg,
+            value : value
+          };
+        }
+      }));
 
 //use flash
 app.use(flash());

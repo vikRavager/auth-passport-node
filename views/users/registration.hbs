@@ -1,4 +1,9 @@
 <div>
+        {{#if errors}}
+                {{#each errors}}
+                        <div>{{msg}}</div>
+                {{/each}}
+        {{/if}}
          <form action="/registration" method="POST">
                 <input type="text" name="name" placeholder="Enter name" id=""><br>
                 <input type="text" name="email" placeholder="Email" id=""><br>
