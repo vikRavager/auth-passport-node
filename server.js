@@ -10,6 +10,7 @@ var passport = require('passport');
 var localStrategy = require('passport-local');
 var cookieParser = require('cookie-parser');
 var expressValidator = require('express-validator');
+var expFileUpload = require('express-fileupload');
 
 require('./models/db');
 
@@ -80,6 +81,9 @@ app.use(function(req,res,next){
         res.locals.user = req.user || null;
         next();
 });
+
+//fileupload
+app.use(expFileUpload());
 
 var userController = require('./controller/userController');
 

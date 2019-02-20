@@ -32,7 +32,7 @@ router.get('/login',loggedOut,function(req,res){
 });
 
 passport.use(new localStrategy(function(username,password,done){
-        console.log('username : '+username);
+       
         User.getUserByUsername(username,function(err,user){
                 if(err) throw err;
                 if(!user){
@@ -79,19 +79,37 @@ router.get('/registration',loggedOut,function(req,res){
 });
 
 router.post('/registration',function(req,res){
-        
-       
+        console.log(User.findOne({email : req.body.email}));
+        if(!User.findOne({email : req.body.email})){
+                req.flash('error','Sorry please take another email . ');
+                res.redirect('/registration');
+        }
+
         req.checkBody('name','Name is required').notEmpty();
         req.checkBody('email','Email is required').isEmail();
         req.checkBody('pass1','Password 1 required').notEmpty();
         req.checkBody('pass2','Password 2 is required').notEmpty();
         req.checkBody('dept','Department is required').notEmpty();
         req.checkBody('pass2','password do not match').equals(req.body.pass1);
-
+        
         var name = req.body.name;
         var email = req.body.email;
         var pass = req.body.pass2;
         var dept = req.body.dept;
+
+        //cv upload to public/cv 
+        // as nameDateToString.pdf
+        var sampleCV = req.files.cv;
+        var currentDate = new Date();
+        var idPath = name;
+        idPath += currentDate.toUTCString();
+        idPath+='.pdf'
+        var dest = './public/cv/'+idPath;
+        console.log('dest : '+dest);
+        // Use the mv() method to place the file somewhere on your server
+        sampleCV.mv(dest, function(err) {
+        if (err) throw err;
+        });
 
         var errors = req.validationErrors();
 
@@ -106,13 +124,15 @@ router.post('/registration',function(req,res){
                         email : email,
                         password : pass,
                         dept : dept,
-                        cv : 'random-txt'
+                        cv : idPath
                 });
 
                 User.createUser(newUser,function(err,user){
                         if(err) throw err;
-                        console.log(err);
+                        
                 });
+
+               
 
                 req.flash('success_msg', 'You are registered ..');
                 res.redirect('/login');

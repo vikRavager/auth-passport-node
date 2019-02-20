@@ -4,7 +4,7 @@
                         <div>{{msg}}</div>
                 {{/each}}
         {{/if}}
-         <form action="/registration" method="POST">
+         <form action="/registration" method="POST" encType="multipart/form-data">
                 <input type="text" name="name" placeholder="Enter name" id=""><br>
                 <input type="text" name="email" placeholder="Email" id=""><br>
                 <input type="password" placeholder="Password" name="pass1" id=""><br>
