@@ -9,47 +9,27 @@ router.get('/',function(req,res){
         res.render('index');
 });
 
-router.get('/login',function(req,res){
+function loggedIn(req,res,next){
+        if(req.isAuthenticated()){
+                return next();
+        }
+        else{
+                res.redirect('/login');
+        }
+}
+function loggedOut(req,res,next){
+        if(!req.isAuthenticated()){
+                return next();
+        }
+        else{
+                res.redirect('/dashboard');
+        }
+}
+
+router.get('/login',loggedOut,function(req,res){
+
         res.render('users/login');
 });
-
-//localStrategy
-
-
-// passport.use(new LocalStrategy(
-//         function(username, password, done) {
-//           User.findOne({ username: username }, function(err, user) {
-//             if (err) { return done(err); }
-//             if (!user) {
-//               return done(null, false, { message: 'Incorrect username.' });
-//             }
-//             if (!user.validPassword(password)) {
-//               return done(null, false, { message: 'Incorrect password.' });
-//             }
-//             return done(null, user);
-//           });
-//         }
-//       ));
-
-
-// passport.serializeUser(function(user, done) {
-//         done(null, user.id);
-// });
-
-// passport.deserializeUser(function(id, done) {
-//         User.findById(id, function(err, user) {
-//                 done(err, user);
-// });
-// });
-
-// router.post('/login',passport.authenticate('local',{
-//         successRedirect : '/dashboard',
-//         failureRedirect : '/login',
-//         failureFlash : true
-// }),function(req,res){
-//         res.redirect('/dashboard');
-// });
-
 
 passport.use(new localStrategy(function(username,password,done){
         console.log('username : '+username);
@@ -63,7 +43,7 @@ passport.use(new localStrategy(function(username,password,done){
                 User.comparedPassword(password,user.password,function(err,isMatch){
                         if(err) throw err;
                         if(isMatch){
-                                console.log('sadUser : '+user); //user is traced..
+                                
                                 
                                 return done(null,user);
                                 
@@ -86,18 +66,15 @@ passport.use(new localStrategy(function(username,password,done){
                 });
         });
 
-router.post('/login',passport.authenticate('local',{
-        successRedirect : '/dashboard',
-        failureRedirect : '/login',
-        failureFlash : true
-}),function(req,res){
-        console.log('req.user : '+user);
-        res.redirect('/dashboard',{
-                output : req.user
-        });
+router.post('/login',passport.authenticate('local',
+        { successRedirect: '/dashboard',
+        failureRedirect: '/login',
+        failureFlash : true }),
+        function(req,res){
+        res.redirect('/dashboard');
 });
 
-router.get('/registration',function(req,res){
+router.get('/registration',loggedOut,function(req,res){
         res.render('users/registration');
 });
 
@@ -144,15 +121,6 @@ router.post('/registration',function(req,res){
 });
 
 
-function loggedIn(req,res,next){
-        if(req.user){
-                next(); 
-        }
-        else{
-                req.flash('error','You are not logged in');
-                res.redirect('/login');
-        }
-}
 
 router.get('/dashboard',loggedIn,function(req,res){
         console.log('user : '+req.user);
@@ -161,9 +129,10 @@ router.get('/dashboard',loggedIn,function(req,res){
         });
 });
 
-router.get('/logout',function(req,res){
+router.get('/logout',loggedIn,function(req,res){
         req.logout();
         req.flash('success_msg','You are logged out');
+        user = null;
         res.redirect('/login');
 });
 

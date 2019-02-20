@@ -33,8 +33,7 @@ app.engine('hbs',exhbs({
 }));
 app.set('view engine', 'hbs');
 
-//passport init
-app.use(passport.initialize());
+
 app.use(cookieParser('foo'));
 //express Session
 app.use(session({
@@ -42,6 +41,8 @@ app.use(session({
         saveUninitialized : true,
         resave : true
 }));
+//passport init
+app.use(passport.initialize());
 app.use(passport.session());
 
 
