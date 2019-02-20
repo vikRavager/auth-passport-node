@@ -7,7 +7,6 @@
         <title>Document</title>
 </head>
 <body>
-        <h3>Main Layout</h3>
        <div> 
                <div>
                    {{#if success_msg}}
@@ -28,6 +27,19 @@
                         </div>
                    {{/if}}    
                </div>
+                <div>
+                <h4>LoginApp</h4>
+                <ul>
+                        {{#if user}}
+                        <li><a href="/dashboard"> dashboard</a></li>
+                        <li><a href="/logout">logout</a></li>
+                        {{else}}
+                        <li><a href="/login">login</a></li>
+                        <li><a href="/registration">register</a></li>
+                        {{/if}}
+                        
+                </ul>
+                </div>
                {{{body}}}
         </div>
 </body>

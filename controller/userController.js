@@ -14,8 +14,45 @@ router.get('/login',function(req,res){
 });
 
 //localStrategy
-passport.use(new localStrategy(function(username,password,done){
 
+
+// passport.use(new LocalStrategy(
+//         function(username, password, done) {
+//           User.findOne({ username: username }, function(err, user) {
+//             if (err) { return done(err); }
+//             if (!user) {
+//               return done(null, false, { message: 'Incorrect username.' });
+//             }
+//             if (!user.validPassword(password)) {
+//               return done(null, false, { message: 'Incorrect password.' });
+//             }
+//             return done(null, user);
+//           });
+//         }
+//       ));
+
+
+// passport.serializeUser(function(user, done) {
+//         done(null, user.id);
+// });
+
+// passport.deserializeUser(function(id, done) {
+//         User.findById(id, function(err, user) {
+//                 done(err, user);
+// });
+// });
+
+// router.post('/login',passport.authenticate('local',{
+//         successRedirect : '/dashboard',
+//         failureRedirect : '/login',
+//         failureFlash : true
+// }),function(req,res){
+//         res.redirect('/dashboard');
+// });
+
+
+passport.use(new localStrategy(function(username,password,done){
+        console.log('username : '+username);
         User.getUserByUsername(username,function(err,user){
                 if(err) throw err;
                 if(!user){
@@ -26,6 +63,8 @@ passport.use(new localStrategy(function(username,password,done){
                 User.comparedPassword(password,user.password,function(err,isMatch){
                         if(err) throw err;
                         if(isMatch){
+                                console.log('sadUser : '+user); //user is traced..
+                                
                                 return done(null,user);
                                 
                         }
@@ -36,7 +75,9 @@ passport.use(new localStrategy(function(username,password,done){
         });
 }));
         passport.serializeUser(function(user, done) {
-                done(null, user.id);
+
+                console.log('userId: '+user._id);
+                done(null, user._id);
         });
         
         passport.deserializeUser(function(id, done) {
@@ -50,7 +91,10 @@ router.post('/login',passport.authenticate('local',{
         failureRedirect : '/login',
         failureFlash : true
 }),function(req,res){
-        res.redirect('/dashboard');
+        console.log('req.user : '+user);
+        res.redirect('/dashboard',{
+                output : req.user
+        });
 });
 
 router.get('/registration',function(req,res){
@@ -99,8 +143,30 @@ router.post('/registration',function(req,res){
 
 });
 
-router.get('/dashboard',function(req,res){
-        res.render('users/home');
+
+function loggedIn(req,res,next){
+        if(req.user){
+                next(); 
+        }
+        else{
+                req.flash('error','You are not logged in');
+                res.redirect('/login');
+        }
+}
+
+router.get('/dashboard',loggedIn,function(req,res){
+        console.log('user : '+req.user);
+        res.render('users/home',{
+                output : req.user
+        });
 });
+
+router.get('/logout',function(req,res){
+        req.logout();
+        req.flash('success_msg','You are logged out');
+        res.redirect('/login');
+});
+
+
 
 module.exports = router;

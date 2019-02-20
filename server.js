@@ -35,18 +35,20 @@ app.set('view engine', 'hbs');
 
 //passport init
 app.use(passport.initialize());
-app.use(passport.session());
-
-
-//static folder
-app.use(express.static(path.join(__dirname,'public')));
-
+app.use(cookieParser('foo'));
 //express Session
 app.use(session({
         secret : 'secret',
         saveUninitialized : true,
         resave : true
 }));
+app.use(passport.session());
+
+
+//static folder
+app.use(express.static(path.join(__dirname,'public')));
+
+
 
 //use express-validator
 app.use(expressValidator({
@@ -74,6 +76,7 @@ app.use(function(req,res,next){
         res.locals.success_msg = req.flash('success_msg');
         res.locals.error_msg = req.flash('error_msg');
         res.locals.error = req.flash('error');
+        res.locals.user = req.user || null;
         next();
 });
 
