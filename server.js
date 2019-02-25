@@ -23,7 +23,8 @@ app.use(bodyParser.urlencoded({
         extended : true
 }));
 app.use(bodyParser.json());
-app.use(cookieParser());
+
+
 
 //extention handlebars to hbs
 app.set('views',path.join(__dirname+'/views/'));
@@ -33,6 +34,7 @@ app.engine('hbs',exhbs({
         layoutsDir :__dirname+'/views/default'
 }));
 app.set('view engine', 'hbs');
+
 
 
 app.use(cookieParser('foo'));

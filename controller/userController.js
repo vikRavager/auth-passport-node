@@ -79,7 +79,7 @@ router.get('/registration',loggedOut,function(req,res){
 });
 
 router.post('/registration',function(req,res){
-        console.log(User.findOne({email : req.body.email}));
+      
         if(!User.findOne({email : req.body.email})){
                 req.flash('error','Sorry please take another email . ');
                 res.redirect('/registration');
@@ -143,7 +143,7 @@ router.post('/registration',function(req,res){
 
 
 router.get('/dashboard',loggedIn,function(req,res){
-        console.log('user : '+req.user);
+      
         res.render('users/home',{
                 output : req.user
         });
