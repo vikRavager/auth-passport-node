@@ -18,6 +18,10 @@ var userSchema = new mongoose.Schema({
         },
         cv : {
                 type : String
+        },
+        isEmailVerified : {
+                type : Boolean,
+                default : false
         }
         
 });

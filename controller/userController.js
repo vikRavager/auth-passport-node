@@ -3,6 +3,8 @@ var router = express.Router();
 var passport = require('passport');
 var localStrategy = require('passport-local').Strategy;
 
+var nodemailer = require('nodemailer');
+
 var User = require('../models/users.model');
 
 router.get('/',function(req,res){
@@ -132,6 +134,31 @@ router.post('/registration',function(req,res){
                         
                 });
 
+                //email verification
+                var transporter = nodemailer.createTransport({
+                        service: 'gmail',
+                        auth: {
+                               user: 'finitefringe@gmail.com',
+                               pass: '123finite456'
+                           }
+                       });
+                const mailOptions = {
+                from: 'finitefringe@gmail.com', // sender address
+                to: email, // list of receivers
+                subject: 'Verify Your Account', // Subject line
+                html: `<p> 
+                <form action="/mailVerified" method="post">
+                <input type="hidden" name="user" value="{{req.body.email}}">
+                <input type="submit" value="Click here to verify">
+                </form></p>`// plain text body
+                };
+                console.log('My user : '+req.body.email);
+                transporter.sendMail(mailOptions, function (err, info) {
+                        if(err)
+                          console.log(err)
+                        else
+                          console.log(info);
+                     });
                
 
                 req.flash('success_msg', 'You are registered ..');
@@ -141,12 +168,44 @@ router.post('/registration',function(req,res){
 });
 
 
+//route to /mailVerified
+router.post('/mailVerified',loggedIn,function(req,res){
+
+        var mailEmail = req.body.user;
+        if(req.user.email == mailEmail){
+                User.findOneAndUpdate({
+                        email : mailEmail
+                }, {
+                        isEmailVerified : true
+                },function(err,doc){
+                        if(!err){
+                                res.redirect('/dashboard');
+                        }
+                        else throw err;
+                });
+        }
+});
+
+
 
 router.get('/dashboard',loggedIn,function(req,res){
       
-        res.render('users/home',{
-                output : req.user
+        User.findOne({email : req.user.email},function(err,doc){
+                if(!err){
+                        if(doc.isEmailVerified == false) {
+                                res.render('users/emailNotVerified');
+                        }
+                        else{
+                                res.render('users/home',{
+                                        output : req.user
+                                });
+                        }
+                }
+                else{
+                        throw err;
+                }
         });
+        
 });
 
 router.get('/logout',loggedIn,function(req,res){
